@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garden Mystery - Puzzle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <div class="card">
+                <h1>🌸 Garden Mystery</h1>
+                <p>Embark on a puzzling adventure through the enchanted garden. Solve riddles, find items, and unravel the mystery!</p>
+                <input type="text" id="username-input" placeholder="Enter your name" maxlength="20">
+                <button id="start-btn" class="btn primary">Start Adventure</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <header>
+                <div class="game-info">
+                    <span id="score-display">Score: 0</span>
+                    <span id="inventory-display">Inventory: 🎒</span>
+                </div>
+                <h1>🌸 Garden Mystery</h1>
+            </header>
+            <main>
+                <div id="puzzle-container" class="card">
+                    <h2 id="puzzle-title"></h2>
+                    <p id="puzzle-description"></p>
+                    <div id="puzzle-input-area"></div>
+                    <div id="message-area"></div>
+                </div>
+                <div class="actions">
+                    <button id="hint-btn" class="btn secondary">💡 Hint</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Completion Screen -->
+        <div id="completion-screen" class="screen">
+            <div class="card">
+                <h1>🎉 Congratulations!</h1>
+                <p>You solved all puzzles and completed the Garden Mystery!</p>
+                <p id="final-score"></p>
+                <button id="restart-btn" class="btn primary">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

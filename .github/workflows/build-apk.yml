@@ -1,3 +1,19 @@
+- name: Debug environment
+  run: |
+    echo "Java version:"
+    java -version
+    echo "Node version:"
+    node --version
+    echo "NPM version:"
+    npm --version
+    echo "Gradle version:"
+    cd android && ./gradlew --version
+    echo "Disk space:"
+    df -h
+    echo "Memory:"
+    free -h
+
+
 name: Build Android APK - Simple
 
 on:

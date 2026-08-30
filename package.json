@@ -1,0 +1,13 @@
+{
+  "name": "puzzle-game-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Garden Mystery puzzle game packaged as Android app",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required for static files'"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}

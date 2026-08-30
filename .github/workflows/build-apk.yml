@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: '20'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -46,6 +46,9 @@ jobs:
           echo ""
           echo "Memory:"
           free -h
+          echo ""
+          echo "Disk space:"
+          df -h
           echo "========================================="
 
       - name: Clean Gradle cache
@@ -69,6 +72,7 @@ jobs:
           EOF
           sed -i "s|API_BASE_PLACEHOLDER|${{ github.event.inputs.api_base || 'http://127.0.0.1:8000' }}|g" frontend/config.js
           echo "Created frontend/config.js"
+          cat frontend/config.js
 
       - name: Create package.json
         run: |
@@ -89,11 +93,14 @@ jobs:
 
       - name: Install Capacitor dependencies
         run: |
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
-          echo "Capacitor packages installed"
+          echo "Installing Capacitor packages..."
+          npm install @capacitor/core@6.0.0 @capacitor/cli@6.0.0 @capacitor/android@6.0.0
+          echo "Capacitor packages installed:"
+          npm list @capacitor/core @capacitor/cli @capacitor/android --depth=0
 
       - name: Build web assets
         run: |
+          echo "Creating www directory..."
           mkdir -p www
           if [ -d "frontend" ]; then
             cp -r frontend/* www/
@@ -103,6 +110,12 @@ jobs:
           fi
           echo "www directory contents:"
           ls -la www/
+          echo "Checking for index.html:"
+          if [ -f "www/index.html" ]; then
+            echo "✓ index.html found"
+          else
+            echo "✗ index.html NOT found"
+          fi
 
       - name: Create Capacitor config
         run: |
@@ -133,6 +146,7 @@ jobs:
         run: |
           npx cap add android
           echo "Android platform added"
+          ls -la android/
 
       - name: Create gradle.properties
         run: |
@@ -140,7 +154,9 @@ jobs:
           org.gradle.jvmargs=-Xmx1024m
           org.gradle.daemon=false
           org.gradle.parallel=true
+          org.gradle.caching=true
           android.useAndroidX=true
+          android.enableJetifier=true
           EOF
           echo "gradle.properties created:"
           cat android/gradle.properties
@@ -156,11 +172,37 @@ jobs:
           chmod +x gradlew
           echo "Permissions set"
 
-      - name: Build APK
+      - name: Build APK with detailed error output
         run: |
           echo "Starting APK build..."
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          # Run gradle with full error output
+          ./gradlew assembleDebug --no-daemon --stacktrace --info 2>&1 | tee build.log
+          exit_code=${PIPESTATUS[0]}
+          if [ $exit_code -ne 0 ]; then
+            echo "========================================="
+            echo "BUILD FAILED WITH EXIT CODE: $exit_code"
+            echo "========================================="
+            echo ""
+            echo "Last 100 lines of build log:"
+            tail -100 build.log
+            echo ""
+            echo "Searching for error patterns:"
+            grep -i "error\|failed\|exception\|what went wrong" build.log | tail -20
+            echo ""
+            echo "Checking SDK licenses:"
+            ls -la $ANDROID_HOME/licenses/ 2>/dev/null || echo "No licenses directory found"
+            echo ""
+            echo "Checking Android SDK:"
+            echo "ANDROID_HOME: $ANDROID_HOME"
+            echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+            ls -la $ANDROID_HOME/ 2>/dev/null || echo "Android SDK not found"
+            echo ""
+            echo "Checking Java compatibility:"
+            java -version
+            echo "JAVA_HOME: $JAVA_HOME"
+            exit $exit_code
+          fi
 
       - name: List APK files
         run: |

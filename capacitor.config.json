@@ -1,9 +1,17 @@
 {
-  "appId": "com.hunt.script",
-  "appName": "Puzzle Hunting",
+  "appId": "com.yourcompany.gardenmystery",
+  "appName": "Garden Mystery",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": [
+      "http://*",
+      "https://*"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true
   }
 }

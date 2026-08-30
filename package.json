@@ -4,10 +4,15 @@
   "description": "Frontend for Garden Mystery puzzle game packaged as Android app",
   "main": "index.js",
   "scripts": {
-    "build": "echo 'No build step required for static files'"
+    "build": "echo 'No build step required for static files'",
+    "test": "echo 'No tests configured'"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "@capacitor/cli": "^6.0.0"
-  }
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  },
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
 }

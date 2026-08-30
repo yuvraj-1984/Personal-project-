@@ -1,7 +1,11 @@
-const API_BASE = 'http://127.0.0.1:8000'; // Adjust if backend runs elsewhere
+// Use the config file for API base
+const API_BASE = APP_CONFIG.API_BASE || 'http://127.0.0.1:8000';
 
 let gameId = null;
 let currentPuzzle = null;
+
+// Rest of the code remains the same...
+// (Keep all other code unchanged)
 
 // DOM elements
 const startScreen = document.getElementById('start-screen');

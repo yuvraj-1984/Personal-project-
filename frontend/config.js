@@ -6,7 +6,7 @@ const APP_CONFIG = {
     // - 'http://10.0.2.2:8000' for Android emulator
     // - 'http://YOUR_COMPUTER_IP:8000' for physical device on same network
     // - 'https://your-deployed-backend.com' for production
-    API_BASE: 'http://127.0.0.1:8000',
+    API_BASE: 'http://192.168.1.100:8000',
     
     // App settings
     APP_NAME: 'Garden Mystery',

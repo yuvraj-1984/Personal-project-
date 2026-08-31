@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from routers import game, puzzles
+import uvicorn
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,3 +25,7 @@ app.include_router(puzzles.router, prefix="/puzzles", tags=["puzzles"])
 @app.get("/")
 def root():
     return {"message": "Puzzle Game API is running"}
+
+# Add this to run on all network interfaces
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -4,9 +4,6 @@ const API_BASE = APP_CONFIG.API_BASE || 'http://127.0.0.1:8000';
 let gameId = null;
 let currentPuzzle = null;
 
-// Rest of the code remains the same...
-// (Keep all other code unchanged)
-
 // DOM elements
 const startScreen = document.getElementById('start-screen');
 const gameScreen = document.getElementById('game-screen');
@@ -41,35 +38,63 @@ function updateHUD(gameState) {
     inventoryDisplay.textContent = `Inventory: ${inv}`;
 }
 
-// API calls
+// API calls with better error handling
 async function apiCall(endpoint, method = 'GET', body = null) {
     const options = {
         method,
         headers: { 'Content-Type': 'application/json' },
     };
     if (body) options.body = JSON.stringify(body);
-    const response = await fetch(`${API_BASE}${endpoint}`, options);
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(error.detail || 'Request failed');
+    
+    try {
+        console.log(`Making ${method} request to: ${API_BASE}${endpoint}`);
+        const response = await fetch(`${API_BASE}${endpoint}`, options);
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
+            throw new Error(error.detail || `Request failed with status ${response.status}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('API call failed:', error);
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            throw new Error(`Cannot connect to backend at ${API_BASE}. Please check:
+1. Backend is running on your computer
+2. Your phone and computer are on the same WiFi
+3. The IP address in config.js is correct`);
+        }
+        throw error;
     }
-    return response.json();
 }
 
 // Start game
 async function startGame() {
     const username = usernameInput.value.trim();
     if (!username) {
-        alert('Please enter your name');
+        displayMessage('Please enter your name', 'error');
         return;
     }
+    
+    // Disable button and show loading
+    startBtn.disabled = true;
+    startBtn.textContent = 'Starting...';
+    
     try {
+        console.log('Starting game with username:', username);
         const game = await apiCall('/game/start', 'POST', { username });
+        console.log('Game started:', game);
         gameId = game.id;
         showScreen(gameScreen);
         await loadCurrentPuzzle();
     } catch (err) {
-        alert('Error starting game: ' + err.message);
+        console.error('Error starting game:', err);
+        alert('Error starting game: ' + err.message + '\n\n' + 
+              'Backend URL: ' + API_BASE + '\n' +
+              'Please ensure your backend is running and the IP is correct.');
+    } finally {
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start Adventure';
     }
 }
 
@@ -136,13 +161,11 @@ function renderPuzzle(puzzle) {
             break;
 
         case 'item_use':
-            // For item_use, we just need a button to use the required item
             puzzleInputArea.innerHTML = `
                 <p>You need to use an item to solve this puzzle.</p>
                 <button class="btn primary" id="use-item-btn">Use Item</button>
             `;
             document.getElementById('use-item-btn').addEventListener('click', () => {
-                // Determine which item to use (first required item in inventory)
                 const requiredItem = puzzle.required_items[0];
                 submitAnswer(requiredItem, requiredItem);
             });

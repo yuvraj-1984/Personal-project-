@@ -172,6 +172,35 @@ jobs:
           chmod +x gradlew
           echo "Permissions set"
 
+      # ═══════════════════════════════════════════════════════════════
+      # 👇 ADD THE "Configure Android Manifest" STEP HERE 👇
+      # ═══════════════════════════════════════════════════════════════
+      - name: Configure Android Manifest
+        run: |
+          echo "Configuring AndroidManifest.xml..."
+          
+          # Add INTERNET permission if not exists
+          if ! grep -q "android.permission.INTERNET" android/app/src/main/AndroidManifest.xml; then
+            sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET" />' android/app/src/main/AndroidManifest.xml
+            echo "✓ Added INTERNET permission"
+          else
+            echo "✓ INTERNET permission already exists"
+          fi
+          
+          # Add usesCleartextTraffic if not exists
+          if ! grep -q "usesCleartextTraffic" android/app/src/main/AndroidManifest.xml; then
+            sed -i 's/<application/<application android:usesCleartextTraffic="true"/' android/app/src/main/AndroidManifest.xml
+            echo "✓ Added usesCleartextTraffic"
+          else
+            echo "✓ usesCleartextTraffic already exists"
+          fi
+          
+          echo "Final AndroidManifest.xml:"
+          cat android/app/src/main/AndroidManifest.xml
+      # ═══════════════════════════════════════════════════════════════
+      # 👆 END OF "Configure Android Manifest" STEP 👆
+      # ═══════════════════════════════════════════════════════════════
+
       - name: Build APK with detailed error output
         run: |
           echo "Starting APK build..."
